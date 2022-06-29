@@ -77,10 +77,27 @@ const createCollege = async function (req, res) {
 const getCollegeDetails = async function (req, res) {
   const collegeName = req.query.collegeName;
 
-  const college = await collegeModel.findOne({ name: collegeName });
+  if (!isValidValue(collegeName))
+  return res
+    .status(400)
+    .send({ status: false, message: "college name is required" })  
+
+
+  
+  const college = await collegeModel.findOne({ name: collegeName , isDeleted: false});
+  if (!college)
+  return res
+    .status(400)
+    .send({ status: false, message: " no college found" });
+  
 
   const getCollegeId = college._id;
-  const internData = await internModel.find({ collegeId: getCollegeId });
+  const internData = await internModel.find({ collegeId: getCollegeId , isDeleted: false});
+
+  if (internData.length == 0)
+  return res
+    .status(400)
+    .send({ status: false, message: "No interns for this college" });
   const data = { ...college.toJSON(), interns: internData };
 
   return res.status(200).send({ status: true, data: data });
