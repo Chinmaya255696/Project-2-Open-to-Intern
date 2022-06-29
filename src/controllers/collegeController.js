@@ -73,8 +73,7 @@ const createCollege = async function (req, res) {
   }
 };
 
-// If there is no data in query params then return all interns
-// If collegeName is not found then show error
+
 const getCollegeDetails = async function (req, res) {
   const collegeName = req.query.collegeName;
 
