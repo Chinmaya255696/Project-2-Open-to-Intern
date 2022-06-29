@@ -26,19 +26,6 @@ const createCollege = async function (req, res) {
     if (!logoLink) return res.status(400).send({ status: false, message: "Logo link is required" });
     if (!isValidValue(logoLink)) return res.status(400).send({ status: false, message: "Logo link is in wrong format" });
 
-    try {
-      url = new URL(logoLink);
-    } catch (err) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Logo link is invalid" });
-    }
-
-    if (!logoLink.match(/\.(jpeg|jpg|gif|png)$/))
-      return res
-        .status(400)
-        .send({ status: false, message: "Logo link is not showing image" });
-
     if (isDeleted && typeof isDeleted !== "boolean")
       return res
         .status(400)
@@ -46,10 +33,15 @@ const createCollege = async function (req, res) {
 
     let found = false
     await axios.get(logoLink)
-      .then((response) => {found = true  })
+      .then((r) => {
+        if (r.status == 200 || r.status == 201) {
+          if (r.headers["content-type"].startsWith("image/")) 
+          found = true;
+        }
+      })
       .catch((error) => { found = false })
 
-    if (found == false) return res.status(400).send({ status: false, message : "Incorrect logo link" });
+    if (found == false) return res.status(400).send({ status: false, message: "Incorrect logo link" });
 
     let collegeName = await collegeModel.findOne({ name: req.body.name });
     if (collegeName)
@@ -74,10 +66,10 @@ const getCollegeDetails = async function (req, res) {
     const college = await collegeModel.findOne({ name: collegeName, isDeleted: false })
     if (!college) return res.status(400).send({ status: false, message: " no college found" });
 
-    const collegeDetails = {name : college.name, fullName : college.fullName, logoLink : college.logoLink}
+    const collegeDetails = { name: college.name, fullName: college.fullName, logoLink: college.logoLink }
 
     const getCollegeId = college._id;
-    const internData = await internModel.find({ collegeId: getCollegeId, isDeleted: false }).select({name : 1, mobile : 1, email : 1})
+    const internData = await internModel.find({ collegeId: getCollegeId, isDeleted: false }).select({ name: 1, mobile: 1, email: 1 })
 
     if (internData.length == 0)
       return res
