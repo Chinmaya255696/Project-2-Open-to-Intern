@@ -11,48 +11,20 @@ const isValidValue = function (value) {
   else if (value.trim().length == 0) return false;
   else return true;
 };
+
 const createIntern = async function (req, res) {
   try {
     let data = req.body;
-    const { name, email, mobile, collegeName } = req.body;
-    if (!isValid(data))
-      return res
-        .status(400)
-        .send({ status: false, message: "No information pass" });
+    const { name, email, mobile, collegeName, isDeleted } = req.body;
 
-    if (!name)
-      return res
-        .status(400)
-        .send({ status: false, message: "Name is required" });
-
-    if (!isValidValue(name))
-      return res
-        .status(400)
-        .send({ status: false, message: "Name is in wrong format" });
-    if (!email)
-      return res
-        .status(400)
-        .send({ status: false, message: "email is required" });
-
-    if (!isValidValue(email))
-      return res
-        .status(400)
-        .send({ status: false, message: "email is in wrong format" });
-
-    if (!email.match(/\S+@\S+\.\S+/))
-      return res
-        .status(400)
-        .send({ status: false, message: "Email is invalid" });
-
-    if (!mobile)
-      return res
-        .status(400)
-        .send({ status: false, message: "mobile is required" });
-
-    if (!isValidValue(mobile))
-      return res
-        .status(400)
-        .send({ status: false, message: "mobile is in wrong format" });
+    if (!isValid(data)) return res.status(400).send({ status: false, message: "No information pass" });
+    if (!name)  return res.status(400).send({ status: false, message: "Name is required" });
+    if (!isValidValue(name))  return res.status(400).send({ status: false, message: "Name is in wrong format" });
+    if (!email) return res.status(400).send({ status: false, message: "email is required" });
+    if (!isValidValue(email)) return res.status(400).send({ status: false, message: "email is in wrong format" });
+    if (!email.match(/\S+@\S+\.\S+/)) return res.status(400).send({ status: false, message: "Email is invalid" });
+    if (!mobile)  return res.status(400).send({ status: false, message: "mobile is required" });
+    if (!isValidValue(mobile))  return res.status(400).send({ status: false, message: "mobile is in wrong format" });
 
     if (!mobile.match(/^\d{10}$/))
       return res
@@ -63,24 +35,14 @@ const createIntern = async function (req, res) {
       $or: [{ email: email }, { mobile: mobile }],
     });
 
-    if (internEmail)
-      return res.status(400).send({
-        status: false,
-        message: "Email or Mobile number already exists",
-      });
+    if (internEmail)  return res.status(400).send({status: false,message: "Email or Mobile number  already exists",});
+    if (!collegeName) return res.status(400).send({ status: false, message: "collegeName is required" });
+    if (!isValidValue(collegeName)) return res.status(400).send({ status: false, message: "collegeName is in wrong format" });
 
-    if (!collegeName)
-      return res
-        .status(400)
-        .send({ status: false, message: "collegeName is required" });
-
-    if (!isValidValue(collegeName))
-      return res
-        .status(400)
-        .send({ status: false, message: "collegeName is in wrong format" });
+    if (typeof isDeleted !== "boolean") return res.status(400).send({ status: false, message: "isDeleted is in wrong format" });
 
     let college = await collegeModel
-      .findOne({ $or: [{ name: collegeName }, { fullName: collegeName }] })
+      .findOne({ $or: [{ name: collegeName }, { fullName: collegeName }], isDeleted : false })
       .select({ _id: 1 });
 
     if (!college)
