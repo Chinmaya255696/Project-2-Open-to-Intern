@@ -39,7 +39,7 @@ const createIntern = async function (req, res) {
     if (!collegeName) return res.status(400).send({ status: false, message: "collegeName is required" });
     if (!isValidValue(collegeName)) return res.status(400).send({ status: false, message: "collegeName is in wrong format" });
 
-    if (typeof isDeleted !== "boolean") return res.status(400).send({ status: false, message: "isDeleted is in wrong format" });
+    if (isDeleted && typeof isDeleted !== "boolean") return res.status(400).send({ status: false, message: "isDeleted is in wrong format" });
 
     let college = await collegeModel
       .findOne({ $or: [{ name: collegeName }, { fullName: collegeName }], isDeleted : false })
