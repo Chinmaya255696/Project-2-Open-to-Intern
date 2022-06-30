@@ -20,24 +20,27 @@ const createCollege = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, message: "No information pass" });
+
     const { name, fullName, logoLink, isDeleted } = req.body;
 
     if (!name)
       return res
         .status(400)
         .send({ status: false, message: "Name is required" });
-    if (!isValidValue(name))
+    if (!isValidValue(name) || /\d/.test(name))
       return res
         .status(400)
         .send({ status: false, message: "Name is in wrong format" });
+
     if (!fullName)
       return res
         .status(400)
         .send({ status: false, message: "Full Name is required" });
-    if (!isValidValue(fullName))
+    if (!isValidValue(fullName) || /\d/.test(fullName))
       return res
         .status(400)
         .send({ status: false, message: "Full Name is in wrong format" });
+
     if (!logoLink)
       return res
         .status(400)
@@ -47,19 +50,6 @@ const createCollege = async function (req, res) {
         .status(400)
         .send({ status: false, message: "Logo link is in wrong format" });
 
-    try {
-      url = new URL(logoLink);
-    } catch (err) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Logo link is invalid" });
-    }
-
-    if (!logoLink.match(/\.(jpeg|jpg|gif|png)$/))
-      return res
-        .status(400)
-        .send({ status: false, message: "Logo link is not showing image" });
-
     if (isDeleted && typeof isDeleted !== "boolean")
       return res
         .status(400)
@@ -68,12 +58,12 @@ const createCollege = async function (req, res) {
     let found = false;
     await axios
       .get(logoLink)
-      .then((response) => {
-        found = true;
+      .then((r) => {
+        if (r.status == 200 || r.status == 201) {
+          if (r.headers["content-type"].startsWith("image/")) found = true;
+        }
       })
-      .catch((error) => {
-        found = false;
-      });
+      .catch((error) => {});
 
     if (found == false)
       return res

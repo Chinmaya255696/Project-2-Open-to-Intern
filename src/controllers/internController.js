@@ -7,8 +7,8 @@ const isValid = function (value) {
 };
 
 const isValidValue = function (value) {
-  if (typeof value !== "string") return false;
-  else if (value.trim().length == 0) return false;
+  if ( typeof value !== "string") return false;
+  else if (value.trim().length == 0  ) return false;
   else return true;
 };
 
@@ -25,10 +25,11 @@ const createIntern = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, message: "Name is required" });
-    if (!isValidValue(name))
+    if (!isValidValue(name) || (/\d/.test(name)) )
       return res
         .status(400)
         .send({ status: false, message: "Name is in wrong format" });
+
     if (!email)
       return res
         .status(400)
@@ -41,6 +42,7 @@ const createIntern = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, message: "Email is invalid" });
+
     if (!mobile)
       return res
         .status(400)
@@ -60,12 +62,11 @@ const createIntern = async function (req, res) {
     });
 
     if (internEmail)
-      return res
-        .status(400)
-        .send({
-          status: false,
-          message: "Email or Mobile number  already exists",
-        });
+      return res.status(400).send({
+        status: false,
+        message: "Email or Mobile number  already exists",
+      });
+
     if (!collegeName)
       return res
         .status(400)
