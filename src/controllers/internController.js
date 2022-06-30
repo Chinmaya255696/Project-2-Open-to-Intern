@@ -1,16 +1,6 @@
 const internModel = require("../models/internModel");
 const collegeModel = require("../models/collegeModel");
-
-const isValid = function (value) {
-  if (Object.keys(value).length === 0) return false;
-  else return true;
-};
-
-const isValidValue = function (value) {
-  if ( typeof value !== "string") return false;
-  else if (value.trim().length == 0  ) return false;
-  else return true;
-};
+const {isValid, isValidValue} = require("../controllers/collegeController")
 
 const createIntern = async function (req, res) {
   try {
@@ -64,7 +54,7 @@ const createIntern = async function (req, res) {
     if (internEmail)
       return res.status(400).send({
         status: false,
-        message: "Email or Mobile number  already exists",
+        message: "Email or Mobile number already in use.",
       });
 
     if (!collegeName)

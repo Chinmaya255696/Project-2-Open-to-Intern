@@ -2,12 +2,12 @@ const collegeModel = require("../models/collegeModel");
 const internModel = require("../models/internModel");
 const axios = require("axios");
 
-const isValid = function (value) {
+const isValid = function (value) {                                  // Validataion for empty request body
   if (Object.keys(value).length === 0) return false;
   else return true;
 };
 
-const isValidValue = function (value) {
+const isValidValue = function (value) {                             // Validation for Strings/ Empty strings
   if (typeof value !== "string") return false;
   else if (value.trim().length == 0) return false;
   else return true;
@@ -55,15 +55,15 @@ const createCollege = async function (req, res) {
         .status(400)
         .send({ status: false, message: "isDeleted is in wrong format" });
 
-    let found = false;
+    let found = false;                                                              // Using axios to check for correct Logolink with content type image
     await axios
       .get(logoLink)
-      .then((r) => {
-        if (r.status == 200 || r.status == 201) {
-          if (r.headers["content-type"].startsWith("image/")) found = true;
+      .then((response) => {
+        if (response.status == 200 || response.status == 201) {
+          if (response.headers["content-type"].startsWith("image/")) found = true;
         }
       })
-      .catch((error) => {});// New comment
+      .catch((error) => {});
 
     if (found == false)
       return res
@@ -101,13 +101,13 @@ const getCollegeDetails = async function (req, res) {
         .status(400)
         .send({ status: false, message: "No college found" });
 
-    const collegeDetails = {
+    const collegeDetails = {                                               // Copying name, fullName & logoLink from college to a new object collegeDetails
       name: college.name,
       fullName: college.fullName,
       logoLink: college.logoLink,
     };
 
-    const getCollegeId = college._id;
+    const getCollegeId = college._id;                                      // Extracting _id from college & using it to get interns
     const internData = await internModel
       .find({ collegeId: getCollegeId, isDeleted: false })
       .select({ name: 1, mobile: 1, email: 1 });
@@ -127,4 +127,6 @@ const getCollegeDetails = async function (req, res) {
 module.exports = {
   createCollege,
   getCollegeDetails,
+  isValid,
+  isValidValue
 };
