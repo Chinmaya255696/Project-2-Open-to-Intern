@@ -63,7 +63,7 @@ const createCollege = async function (req, res) {
           if (r.headers["content-type"].startsWith("image/")) found = true;
         }
       })
-      .catch((error) => {});
+      .catch((error) => {});// New comment
 
     if (found == false)
       return res
